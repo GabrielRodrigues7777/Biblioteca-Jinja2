@@ -6,20 +6,77 @@ app = Flask(__name__)
 biblioteca = dados.carregar_do_arquivo()
 
 
-# Rota da página inicial (HTML)
 @app.route('/')
 def index():
     biblioteca_atual = dados.carregar_do_arquivo()
     return render_template('index.html', livros=biblioteca_atual)
 
 
-# Rota que retorna todos os livros em JSON
+@app.route('/cadastrar', methods=['GET'])
+def exibir_cadastro():
+    return render_template('cadastrar.html')
+
+
+@app.route('/cadastrar', methods=['POST'])
+def salvar_cadastro():
+    isbn = request.form['isbn']
+
+    for livro in biblioteca:
+        if livro['isbn'] == isbn:
+            erro = 'Já existe um livro com este ISBN!'
+            return render_template('cadastrar.html', erro=erro)
+
+    novo_livro = {
+        'isbn': isbn,
+        'titulo': request.form['titulo'],
+        'autor': request.form['autor'],
+        'genero': request.form['genero'],
+        'ano_publicacao': int(request.form['ano_publicacao']),
+        'editora': request.form['editora'],
+        'paginas': int(request.form['paginas']),
+        'status': 'disponivel',
+        'localizacao': request.form['localizacao']
+    }
+
+    biblioteca.append(novo_livro)
+    dados.salvar_no_arquivo(biblioteca)
+
+    mensagem = 'Livro cadastrado com sucesso!'
+    return render_template('cadastrar.html', mensagem=mensagem)
+
+
+@app.route('/atualizar/<isbn>', methods=['GET'])
+def exibir_atualizar(isbn):
+    for livro in biblioteca:
+        if livro['isbn'] == isbn:
+            return render_template('atualizar.html', livro=livro)
+    return 'Livro não encontrado', 404
+
+
+@app.route('/atualizar/<isbn>', methods=['POST'])
+def salvar_atualizar(isbn):
+    for livro in biblioteca:
+        if livro['isbn'] == isbn:
+            livro['titulo'] = request.form['titulo']
+            livro['autor'] = request.form['autor']
+            livro['genero'] = request.form['genero']
+            livro['ano_publicacao'] = int(request.form['ano_publicacao'])
+            livro['editora'] = request.form['editora']
+            livro['paginas'] = int(request.form['paginas'])
+            livro['localizacao'] = request.form['localizacao']
+            livro['status'] = request.form['status']
+
+            dados.salvar_no_arquivo(biblioteca)
+            return render_template('index.html', livros=biblioteca)
+
+    return 'Livro não encontrado', 404
+
+
 @app.route('/biblioteca', methods=['GET'])
 def exibir_json():
     return jsonify(biblioteca), 200
 
 
-# Rota para inserir um novo livro
 @app.route('/biblioteca/insert', methods=['POST'])
 def inserir_livro():
     novo_livro = request.get_json()
@@ -28,7 +85,6 @@ def inserir_livro():
     return jsonify('Novo livro inserido'), 201
 
 
-# Rota para buscar um livro pelo ISBN
 @app.route('/biblioteca/<isbn>')
 def achar_isbn(isbn):
     for livro in biblioteca:
@@ -37,7 +93,6 @@ def achar_isbn(isbn):
     return jsonify('Livro não encontrado'), 404
 
 
-# Rota para deletar um livro pelo ISBN
 @app.route('/biblioteca/delete/<isbn>', methods=['DELETE'])
 def deletar_livro(isbn):
     for livro in biblioteca:

@@ -20,5 +20,16 @@
         "paginas": 232,
         "status": "emprestado",
         "localizacao": "Estante B2"
+    },
+    {
+        "isbn": "efdfgdfgdgf",
+        "titulo": "ggfgdfgfgfgd",
+        "autor": "ytytytyt",
+        "genero": "romance",
+        "ano_publicacao": 1988,
+        "editora": "atica",
+        "paginas": 650,
+        "status": "disponivel",
+        "localizacao": "fsfsfds"
     }
 ]
