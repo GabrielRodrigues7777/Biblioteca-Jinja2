@@ -32,7 +32,7 @@ def salvar_cadastro():
         'autor': request.form['autor'],
         'genero': request.form['genero'],
         'ano_publicacao': int(request.form['ano_publicacao']),
-        'editora': request.form['editora'],
+        'egit add .ditora': request.form['editora'],
         'paginas': int(request.form['paginas']),
         'status': 'disponivel',
         'localizacao': request.form['localizacao']
